@@ -19,7 +19,5 @@ Large datasets, complex data formats, and incompatible tools can make atmospheri
 
 #### LICENSE
 
-Copyright 2013, The MITRE Corporation.
-
-[Licensed under Apache 2.0](LICENSE.md)
+Copyright 2013, The MITRE Corporation. [Licensed under Apache 2.0](LICENSE.md)
 
