@@ -3,6 +3,8 @@ Atmospheric Toolbox
 
 The Atmospheric Toolbox contains methods for accessing, analyzing, and visualizing atmospheric data.
 
+![Atmospheric Logo](doc/images/logo.png)
+
 Large datasets, complex data formats, and incompatible tools can make atmospheric analysis complicated. This toolbox addresses these challenges.
 
 ### Supported Datasets
