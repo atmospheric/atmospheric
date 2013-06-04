@@ -5,11 +5,7 @@ function setupAtmospheric
 %   To install the toolbox, add the following to lines to your startup.m:
 %
 %     cd('c:\your_toolbox_location');
-%     initAtmospheric();
-%
-% NOTES:
-%   Classpath.txt is not modified; all java libraries are added to the 
-%   dynamic java classpath.
+%     setupAtmospheric();
 
 % Copyright 2013, The MITRE Corporation.  All rights reserved.
 %==========================================================================
@@ -36,6 +32,9 @@ end
 addpath(fullfile(home))
 addpath(fullfile(home,'classes'))
 addpath(fullfile(home,'util'))
+addpath(fullfile(home,'external','cm_and_cb_utilities'))
+addpath(fullfile(home,'external','colormaps'))
+addpath(fullfile(home,'external','xunit','xunit'))
 
 %% Suppress Netcdf Logger output
 org.apache.log4j.BasicConfigurator.configure();
