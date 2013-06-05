@@ -32,7 +32,7 @@ function h = plot(this,varargin)
 
 %% Parse input arguments
 % Set default level depending on file type
-switch this.source
+switch this.product
   case 'gfs'
     defaultLevel = 16; % 300 mb
   case 'ruc'
@@ -70,8 +70,8 @@ if strcmp(p.Results.variable,'wind')
     ~any(strcmp('vComponentOfWindHybrid',this.variablesLoaded))
     this.load();
   end
-  u = squeeze(this.uComponentOfWind(level,:,:));
-  v = squeeze(this.vComponentOfWind(level,:,:));
+  u = squeeze(this.uComponentOfWindHybrid(level,:,:));
+  v = squeeze(this.vComponentOfWindHybrid(level,:,:));
   plane = sqrt(u.^2 + v.^2);
 else
   % Load the variable if necessary.
@@ -127,7 +127,7 @@ pos=get(gca,'Position');
 gh = axes('position',[(pos(1)),pos(2),pos(3),0.06],...
   'xtick',[],'ytick',[],'visible','off');
 lab = sprintf('%s %sZ,  %02d Hour Outlook,  Level %02d',...
-  upper(this.source), datestr(this.forecastDate,'dd-mmm-yyyy HH:MM:SS'),...
+  upper(this.product), datestr(this.forecastDate,'dd-mmm-yyyy HH:MM:SS'),...
   this.forecastOutlook, p.Results.level);
  
 text(0.5,0.5,lab,...

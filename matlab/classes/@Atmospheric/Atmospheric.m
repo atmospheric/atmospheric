@@ -16,7 +16,7 @@ classdef Atmospheric < dynamicprops
     camelToNoaa
   end
   properties
-    source
+    product
     forecastDate
     forecastOutlook
     variables
@@ -46,15 +46,17 @@ classdef Atmospheric < dynamicprops
         %   metadata, but I can't find where this info is saved.  -CMW
         [~,fn] = fileparts(filename);
         if ~isempty(regexp(fn,'ruc','once'))
-          obj.source = 'ruc';
+          obj.product = 'ruc';
         elseif ~isempty(regexp(fn,'rap','once'))
-          obj.source = 'rap';
+          obj.product = 'rap';
+        elseif ~isempty(regexp(fn,'nam','once'))
+          obj.product = 'nam';
         elseif ~isempty(regexp(fn,'gfs','once'))
-          obj.source = 'gfs';
+          obj.product = 'gfs';
         elseif ~isempty(regexpi(fn,'hrrr','once'))
-          obj.source = 'hrrr';
+          obj.product = 'hrrr';
         else
-          obj.source = '';
+          obj.product = '';
         end
         
         % Load basic file info.
@@ -70,8 +72,8 @@ classdef Atmospheric < dynamicprops
           end
           
           % Define coordinates and transforms.
-          switch obj.source
-            case {'ruc','rap','hrrr'}
+          switch obj.product
+            case {'ruc','rap','hrrr','nam'}
               obj.x = obj.dataset.data('x');
               obj.y = obj.dataset.data('y');
               transform = obj.dataset.netcdf.getCoordinateTransforms.get(0);
@@ -126,5 +128,5 @@ classdef Atmospheric < dynamicprops
     Zgeoid = geometricToGeoid(ZgmFt, lat, lon)
   end
 
-  % Copyright 2012, The MITRE Corporation.  All rights reserved.
+  % Copyright 2013, The MITRE Corporation.  All rights reserved.
 end

@@ -106,7 +106,7 @@ end
 
 
 %% Perform interpolation
-if strcmp(this.source,'gfs')
+if strcmp(this.product,'gfs')
   % No projection needed for GFS, use lat lon directly.
   longitude = mod((longitude + 360),360); % Enforce 0 to 360.
   xi = interp1(this.longitude(1,:),1:size(this.longitude,2),longitude(:));
