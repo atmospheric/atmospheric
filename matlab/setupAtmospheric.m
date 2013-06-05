@@ -31,6 +31,7 @@ end
 %% Add required classpaths
 addpath(fullfile(home))
 addpath(fullfile(home,'classes'))
+addpath(fullfile(home,'test'))
 addpath(fullfile(home,'util'))
 addpath(fullfile(home,'external','cm_and_cb_utilities'))
 addpath(fullfile(home,'external','colormaps'))
