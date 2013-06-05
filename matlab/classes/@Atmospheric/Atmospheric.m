@@ -41,24 +41,6 @@ classdef Atmospheric < dynamicprops
       end
       
       if ~isempty(filename)        
-        % Identify data source based on filename.
-        %   Ideally this could be distinguished from the netcdf 
-        %   metadata, but I can't find where this info is saved.  -CMW
-        [~,fn] = fileparts(filename);
-        if ~isempty(regexp(fn,'ruc','once'))
-          obj.product = 'ruc';
-        elseif ~isempty(regexp(fn,'rap','once'))
-          obj.product = 'rap';
-        elseif ~isempty(regexp(fn,'nam','once'))
-          obj.product = 'nam';
-        elseif ~isempty(regexp(fn,'gfs','once'))
-          obj.product = 'gfs';
-        elseif ~isempty(regexpi(fn,'hrrr','once'))
-          obj.product = 'hrrr';
-        else
-          obj.product = '';
-        end
-        
         % Load basic file info.
         obj.dataset = ncdataset(filename);
         if ~isempty(obj.dataset)
@@ -71,6 +53,17 @@ classdef Atmospheric < dynamicprops
             obj.forecastOutlook = obj.forecastOutlook(1);
           end
           
+          % Keyword search over the Netcdf global attributes to identify
+          % the NOAA product type.
+          attr = char(obj.dataset.netcdf.getGlobalAttributes().toString);
+          knownTypes = '(gfs)|(rap)|(ruc)|(nam)|(hrrr)';
+          tok = regexpi(attr,knownTypes,'once','tokens');
+          if ~isempty(tok)
+            obj.product = lower(tok{1});
+          else
+            obj.product = '';
+          end
+                    
           % Define coordinates and transforms.
           switch obj.product
             case {'ruc','rap','hrrr','nam'}
