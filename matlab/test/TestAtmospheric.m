@@ -37,7 +37,7 @@ function self = TestAtmospheric(name)
 end        
 
 %% Test constructor
-function test_Atmospheric_constructor(self) %#ok<*MANU,*DEFNU>
+function test_Atmospheric_emptyConstructor(self) %#ok<*MANU,*DEFNU>
   atmo = Atmospheric();
   assert(isempty(atmo.forecastDate))
   assert(isempty(atmo.forecastOutlook))
@@ -48,29 +48,98 @@ function test_Atmospheric_constructor(self) %#ok<*MANU,*DEFNU>
 end
 
 % Test the basic properties for each file type.
-function test_Atmospheric_idGfs(self)
+%
+% Truth values are determined from direct examination of the detailed
+% Netcdf metadata dump, as provided by Atmospheric.details()
+
+%% GFS Highres
+function test_Atmospheric_idGfsHighres_A(self)
   assert(strcmpi(self.gfsHighres.product,'gfs'))
+end
+function test_Atmospheric_idGfsHighres_B(self)
   assert(strcmpi(self.gfsHighres.verticalCoordSys,'isobaric'))
+end
+function test_Atmospheric_idGfsHighres_C(self)
   assert(self.gfsHighres.verticalLevels == 26)
 end
 
-function test_Atmospheric_idGfsB(self)
-  assert(strcmpi(self.gfsLowres.product,'gfs'));
-  assert(strcmpi(self.gfsLowres.verticalCoordSys,'isobaric'));
+%% GFS Lowres
+function test_Atmospheric_idGfsLoweres_A(self)
+  assert(strcmpi(self.gfsLowres.product,'gfs'))
+end
+function test_Atmospheric_idGfsLoweres_B(self)
+  assert(strcmpi(self.gfsLowres.verticalCoordSys,'isobaric'))
+end
+function test_Atmospheric_idGfsLoweres_C(self)
   assert(self.gfsLowres.verticalLevels == 26)
 end
 
-function test_Atmospheric_idNam(self)
-  assert(strcmpi(self.namIsobaric.product,'nam'));
-  assert(strcmpi(self.namIsobaric.verticalCoordSys,'isobaric'));
-  assert(self.namIsobaric.verticalLevels == 42);
+%% NAM
+function test_Atmospheric_idNam_A(self)
+  assert(strcmpi(self.namIsobaric.product,'nam'))
+end
+function test_Atmospheric_idNam_B(self)
+  assert(strcmpi(self.namIsobaric.verticalCoordSys,'isobaric'))
+end
+function test_Atmospheric_idNam_C(self)
+  assert(self.namIsobaric.verticalLevels == 42)
 end
 
-function test_Atmospheric_idRuc(self)
-  assert(strcmpi(self.rucIsobaric13km.product,'ruc'));
-  assert(strcmpi(self.rucIsobaric13km.verticalCoordSys,'isobaric'));
-  assert(self.rucIsobaric13km.verticalLevels == 37);
+%% RUC Isobaric 13km
+function test_Atmospheric_idRucIsobaric13_A(self)
+  assert(strcmpi(self.rucIsobaric13km.product,'ruc'))
 end
+function test_Atmospheric_idRucIsobaric13_B(self)
+  assert(strcmpi(self.rucIsobaric13km.verticalCoordSys,'isobaric'))
+end
+function test_Atmospheric_idRucIsobaric13_C(self)
+  assert(self.rucIsobaric13km.verticalLevels == 37)
+end
+
+%% RUC Hybrid 13km
+function test_Atmospheric_idRucHybrid13_A(self)
+  assert(strcmpi(self.rucHybrid13km.product,'ruc'))
+end
+function test_Atmospheric_idRucHybrid13_B(self)
+  assert(strcmpi(self.rucHybrid13km.verticalCoordSys,'hybrid'))
+end
+function test_Atmospheric_idRucHybrid13_C(self)
+  assert(self.rucHybrid13km.verticalLevels == 50)
+end
+
+%% RUC Hybrid 20km
+function test_Atmospheric_idRucHybrid20_A(self)
+  assert(strcmpi(self.rucHybrid20km.product,'ruc'));
+end
+function test_Atmospheric_idRucHybrid20_B(self)
+  assert(strcmpi(self.rucHybrid20km.verticalCoordSys,'hybrid'));
+end
+function test_Atmospheric_idRucHybrid20_C(self)
+  assert(self.rucHybrid20km.verticalLevels == 50);
+end
+
+%% RAP Hybrid 13km
+function test_Atmospheric_idRapHybrid13_A(self)
+  assert(strcmpi(self.rapHybrid13km.product,'rap'));
+end
+function test_Atmospheric_idRapHybrid13_B(self)
+  assert(strcmpi(self.rapHybrid13km.verticalCoordSys,'hybrid'));
+end
+function test_Atmospheric_idRapHybrid13_C(self)
+  assert(self.rapHybrid13km.verticalLevels == 50);
+end
+
+%% RAP Isobaric 13km
+function test_Atmospheric_idRapIsobaric13_A(self)
+  assert(strcmpi(self.rapIsobaric13km.product,'rap'));
+end
+function test_Atmospheric_idRapIsobaric13_B(self)
+  assert(strcmpi(self.rapIsobaric13km.verticalCoordSys,'isobaric'));
+end
+function test_Atmospheric_idRapIsobaric13_C(self)
+  assert(self.rapIsobaric13km.verticalLevels == 37);
+end
+
 
 end
 end
