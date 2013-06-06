@@ -17,6 +17,8 @@ classdef Atmospheric < dynamicprops
   end
   properties
     product
+    verticalCoordSys
+    verticalLevels
     forecastDate
     forecastOutlook
     variables
@@ -53,8 +55,8 @@ classdef Atmospheric < dynamicprops
             obj.forecastOutlook = obj.forecastOutlook(1);
           end
           
-          % Keyword search over the Netcdf global attributes to identify
-          % the NOAA product type.
+          % Keyword search over the Netcdf global attributes.
+          % Identifies NOAA product type.
           attr = char(obj.dataset.netcdf.getGlobalAttributes().toString);
           knownTypes = '(gfs)|(rap)|(ruc)|(nam)|(hrrr)';
           tok = regexpi(attr,knownTypes,'once','tokens');
@@ -89,6 +91,31 @@ classdef Atmospheric < dynamicprops
           obj.noaaToCamel = containers.Map(noaa,cc,'UniformValues',true);
           obj.camelToNoaa = containers.Map(cc,noaa,'UniformValues',true);
           obj.variables = sort(cc);
+          
+          % Define Vertical Coordinate System based on netcdf.
+          obj.verticalLevels = 0;
+          obj.verticalCoordSys = '';
+          knownTypes = '(hybrid)|(isobaric)';
+          attr = char(obj.dataset.netcdf.getCoordinateSystems.toString);
+          tok = regexpi(attr,knownTypes,'once','tokens');
+          if ~isempty(tok), 
+            % Capitalize the first letter, for use later in retrieving
+            % grids such as 'uComponentOfWindHybrid'.
+            capitalized = regexprep(tok{1},'(\<\w)','${upper($1)}');
+            obj.verticalCoordSys = capitalized;
+
+            % Load the vertical levels as the grid having the largest size.
+            grids = regexpi(obj.variables,['^(' capitalized '.*)'],...
+              'tokens');
+            grids = vertcat(grids{:});
+            grids = vertcat(grids{:}); % Additional cell-derefence
+
+            for i = 1:length(grids)
+              obj.load(grids{i});
+              obj.verticalLevels = max(obj.verticalLevels, ...
+                length(obj.(grids{i})));
+            end
+          end
         end
       end
     end

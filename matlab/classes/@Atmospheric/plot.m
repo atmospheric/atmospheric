@@ -5,9 +5,9 @@ function h = plot(this,varargin)
 %   this = Atmospheric(now)
 %   this.load()
 %   this.plot()
-%   this.plot('variable','temperature')
-%   this.plot('variable','temperature','colormap','jet')
-%   this.plot('variable','temperature','colormap','jet','level',1)
+%   this.plot('variable','temperatureHybrid')
+%   this.plot('variable','temperatureHybrid','colormap','jet')
+%   this.plot('variable','temperatureHybrid','colormap','jet','level',1)
 %
 % INPUTS:
 %   this - Atmospheric object
@@ -31,16 +31,14 @@ function h = plot(this,varargin)
 %==========================================================================
 
 %% Parse input arguments
-% Set default level depending on file type
-switch this.product
-  case 'gfs'
-    defaultLevel = 16; % 300 mb
-  case 'ruc'
-    defaultLevel = 19;
-  case {'rap','hrrr'}
-    defaultLevel = 33;
-  otherwise 
-    defaultLevel = 1;
+% Set the display level based on the total number of vertical levels.
+% The magic numbers here were chosen empirically to correspond
+% approximately to the jet stream levels, around 300mb.
+switch this.verticalLevels
+  case 26, defaultLevel = 10;
+  case 37, defaultLevel = 16;
+  case 50, defaultLevel = 13;
+  otherwise, defaultLevel = floor(this.verticalLevels*1/3);
 end
 
 % Parse inputs
@@ -66,12 +64,14 @@ end
 %% Select a plane of data.
 level = p.Results.level;
 if strcmp(p.Results.variable,'wind')
-  if ~any(strcmp('uComponentOfWindHybrid',this.variablesLoaded)) || ...
-    ~any(strcmp('vComponentOfWindHybrid',this.variablesLoaded))
+  uName = ['uComponentOfWind' this.verticalCoordSys];
+  vName = ['vComponentOfWind' this.verticalCoordSys];
+  if ~any(strcmp(uName,this.variablesLoaded)) || ...
+    ~any(strcmp(vName,this.variablesLoaded))
     this.load();
   end
-  u = squeeze(this.uComponentOfWindHybrid(level,:,:));
-  v = squeeze(this.vComponentOfWindHybrid(level,:,:));
+  u = squeeze(this.(uName)(level,:,:));
+  v = squeeze(this.(vName)(level,:,:));
   plane = sqrt(u.^2 + v.^2);
 else
   % Load the variable if necessary.

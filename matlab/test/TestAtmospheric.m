@@ -9,12 +9,9 @@ classdef TestAtmospheric < TestCase
 properties
   gfsHighres = Atmospheric(AtmoSampleData.gfsHighresIsobaric);
   gfsLowres = Atmospheric(AtmoSampleData.gfsLowresIsobaric);
-  
   namIsobaric = Atmospheric(AtmoSampleData.namIsobaric);
-  
   rapHybrid13km = Atmospheric(AtmoSampleData.rapHybrid13km);
   rapIsobaric13km = Atmospheric(AtmoSampleData.rapIsobaric13km);   
-  
   rucHybrid13km = Atmospheric(AtmoSampleData.rucHybrid13km);
   rucHybrid20km = Atmospheric(AtmoSampleData.rucHybrid20km);
   rucIsobaric13km = Atmospheric(AtmoSampleData.rucIsobaric13km);
@@ -50,46 +47,30 @@ function test_Atmospheric_constructor(self) %#ok<*MANU,*DEFNU>
   assert(isempty(atmo.projectedDate))
 end
 
+% Test the basic properties for each file type.
 function test_Atmospheric_idGfs(self)
-  assert(strcmp(self.gfsHighres.product,'gfs'));
+  assert(strcmpi(self.gfsHighres.product,'gfs'))
+  assert(strcmpi(self.gfsHighres.verticalCoordSys,'isobaric'))
+  assert(self.gfsHighres.verticalLevels == 26)
 end
 
 function test_Atmospheric_idGfsB(self)
-  assert(strcmp(self.gfsLowres.product,'gfs'));
+  assert(strcmpi(self.gfsLowres.product,'gfs'));
+  assert(strcmpi(self.gfsLowres.verticalCoordSys,'isobaric'));
+  assert(self.gfsLowres.verticalLevels == 26)
 end
 
 function test_Atmospheric_idNam(self)
-  assert(strcmp(self.namIsobaric.product,'nam'));
+  assert(strcmpi(self.namIsobaric.product,'nam'));
+  assert(strcmpi(self.namIsobaric.verticalCoordSys,'isobaric'));
+  assert(self.namIsobaric.verticalLevels == 42);
 end
 
 function test_Atmospheric_idRuc(self)
-  assert(strcmp(self.rucIsobaric13km.product,'ruc'));
+  assert(strcmpi(self.rucIsobaric13km.product,'ruc'));
+  assert(strcmpi(self.rucIsobaric13km.verticalCoordSys,'isobaric'));
+  assert(self.rucIsobaric13km.verticalLevels == 37);
 end
-
-% function test_Atmospheric_A(self)
-%   atmo = Atmospheric(self.typeA);
-%   assert(atmo.forecastDate == self.typeA)
-%   assert(atmo.projectedDate == self.typeA)
-%   assert(length(atmo.variables) == 66)
-% end
-% function test_Atmospheric_B(self)
-%   atmo = Atmospheric(self.typeB);
-%   assert(atmo.forecastDate == self.typeB)
-%   assert(atmo.projectedDate == self.typeB)
-%   assert(length(atmo.variables) == 92)
-% end
-% function test_Atmospheric_C(self)
-%   atmo = Atmospheric(self.typeC);
-%   assert(atmo.forecastDate == self.typeC)
-%   assert(atmo.projectedDate == self.typeC)
-%   assert(length(atmo.variables) == 70)
-% end
-% function test_Atmospheric_D(self)
-%   atmo = Atmospheric(self.typeD);
-%   assert(atmo.forecastDate == self.typeD)
-%   assert(atmo.projectedDate == self.typeD)
-%   assert(length(atmo.variables) == 69)
-% end
 
 end
 end

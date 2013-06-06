@@ -35,11 +35,12 @@ function this = load(this,fieldsToLoad,enableUnitConversion)
 % Copyright 2013, The MITRE Corporation.  All rights reserved.
 %==========================================================================
 
-% Validate input.
+% Set defaults
 if nargin < 3, enableUnitConversion = true; end
 if nargin < 2
-  fieldsToLoad = {'uComponentOfWindHybrid','vComponentOfWindHybrid',...
-    'geopotentialHeight'};
+  fieldsToLoad = {['uComponentOfWind' this.verticalCoordSys],...
+    ['vComponentOfWind' this.verticalCoordSys],...
+    ['geopotentialHeight' this.verticalCoordSys]};
 end
 
 % Standardize as cell array, boolean.
@@ -61,9 +62,11 @@ if isempty(this.dataset), return, end
 fieldsToLoad = camel(fieldsToLoad);
 
 % Height always specified as geopotential, then compute geometric.
-fieldsToLoad = strrep(fieldsToLoad,'geometricHeight','geopotentialHeight');
-fieldsToLoad = strrep(fieldsToLoad,'geometricHeightSurface',...
-  'geopotentialHeightSurface');
+fieldsToLoad = strrep(fieldsToLoad,...
+  ['geometricHeight' this.verticalCoordSys],...
+  ['geopotentialHeight'  this.verticalCoordSys]);
+fieldsToLoad = strrep(fieldsToLoad,...
+  'geometricHeightSurface','geopotentialHeightSurface');
 
 
 % Can specify static temperature to compute from geopotential temp.
@@ -84,23 +87,26 @@ end
 noaaFields = cell(size(fieldsToLoad));
 for i = 1:length(fieldsToLoad)
   try
-    % Some RUC files use uWind, vWind, instead of 'uComponentOfWind', etc.
-    if this.camelToNoaa.isKey('uWind') && ...
-        strcmp(fieldsToLoad{i},'uComponentOfWind')
-      noaaFields{i} = this.camelToNoaa('uWind');
-    elseif this.camelToNoaa.isKey('vWind') && ...
-        strcmp(fieldsToLoad{i},'vComponentOfWind')
-      noaaFields{i} = this.camelToNoaa('vWind');   
-    elseif this.camelToNoaa.isKey('uWindSurface') && ...
-        strcmp(fieldsToLoad{i},'uComponentOfWindSurface')
-      noaaFields{i} = this.camelToNoaa('uWindSurface');
-    elseif this.camelToNoaa.isKey('vWindSurface') && ...
-        strcmp(fieldsToLoad{i},'vComponentOfWindSurface')
-      noaaFields{i} = this.camelToNoaa('vWindSurface');
-    else
-      % Normal case.
-      noaaFields{i} = this.camelToNoaa(fieldsToLoad{i});
-    end
+    noaaFields{i} = this.camelToNoaa(fieldsToLoad{i});  
+
+% This issue should be addressed by the new Netcdf 4.3.16 libraries.
+%     % Some RUC files use uWind, vWind, instead of 'uComponentOfWind', etc.
+%     if this.camelToNoaa.isKey('uWind') && ...
+%         strcmp(fieldsToLoad{i},'uComponentOfWind')
+%       noaaFields{i} = this.camelToNoaa('uWind');
+%     elseif this.camelToNoaa.isKey('vWind') && ...
+%         strcmp(fieldsToLoad{i},'vComponentOfWind')
+%       noaaFields{i} = this.camelToNoaa('vWind');   
+%     elseif this.camelToNoaa.isKey('uWindSurface') && ...
+%         strcmp(fieldsToLoad{i},'uComponentOfWindSurface')
+%       noaaFields{i} = this.camelToNoaa('uWindSurface');
+%     elseif this.camelToNoaa.isKey('vWindSurface') && ...
+%         strcmp(fieldsToLoad{i},'vComponentOfWindSurface')
+%       noaaFields{i} = this.camelToNoaa('vWindSurface');
+%     else
+%       % Normal case.
+%       noaaFields{i} = this.camelToNoaa(fieldsToLoad{i});
+%     end
     
   catch %#ok<CTCH>
     error(['Field not available: ''%s''\nSee this.variables for a '...
@@ -127,13 +133,14 @@ if enableUnitConversion
   if any(strcmpi(fieldsToLoad,'geopotentialHeight'))
     nLevels = size(this.geopotentialHeight,1);
     tmpLat = shiftdim(repmat(this.latitude,[1 1 nLevels]),2);
-    tmpLon = shiftdim(repmat(this.longitude,[1 1 nLevels]),2);
     if ~isprop(this,'geometricHeight')
       addprop(this,'geometricHeight');
     end
     this.geometricHeight = Atmospheric.geopotentialToGeometricHeight(...
       this.geopotentialHeight,tmpLat) * this.feetPerMeter;
     this.variablesLoaded = union(this.variablesLoaded,'geometricHeight');
+    
+%     tmpLon = shiftdim(repmat(this.longitude,[1 1 nLevels]),2);
 %     addprop(this,'geoidHeight');
 %     this.geoidHeight = Atmospheric.geometricToGeoid(...
 %       this.geometricHeight, tmpLat, tmpLon);
@@ -163,14 +170,13 @@ if enableUnitConversion
     end
   end
   
-  % Bug fix for GFS, we replicate pressure to be full grid dimensions.
+  % Pressure replicated for interpolation of isobaric files.
   % Same fix also applies to isobaric files.
-  if any(strcmp(fieldsToLoad,'pressure')) && ...
-      (length(this.pressure(:)) == 37 || strcmp(this.product,'gfs') ...
-      || length(this.pressure(:)) == 35) 
+  if strcmpi(this.verticalCoordSys,'isobaric') && ...
+      any(strcmp(fieldsToLoad,'pressure'))
     [nX,nY] = size(this.latitude);
-     this.pressure = reshape(repmat(this.pressure,nX,nY), ...
-       [length(this.pressure), nX, nY]);
+     this.pressureIsobaric = reshape(repmat(this.pressureIsobaric,nX,nY), ...
+       [length(this.pressureIsobaric), nX, nY]);
   end
   
   % Compute static temperature from virtual potential temperature.
