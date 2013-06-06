@@ -17,15 +17,15 @@ classdef Atmospheric < dynamicprops
   end
   properties
     product
-    verticalCoordSys
-    verticalLevels
     forecastDate
     forecastOutlook
+    verticalCoordSys
+    verticalLevels
     variables
     variablesLoaded
+    windsAlignedToTrueNorth = false;
     latitude
     longitude
-    windsAlignedToTrueNorth = false;
   end
   properties(Dependent)
     projectedDate
@@ -71,6 +71,13 @@ classdef Atmospheric < dynamicprops
             obj.product = lower(tok{1});
           else
             obj.product = '';
+          end
+          
+          % Fix known bug in RapidRefresh metadata- the metadata still
+          % indicated "Ruc" even after the transition to RAP.
+          if strcmp(obj.product,'ruc') && ...
+              obj.forecastDate > datenum(2012,5,1)
+            obj.product = 'rap';
           end
                     
           % Define coordinates and transforms.
