@@ -37,8 +37,8 @@ function h = plot(this,varargin)
 switch this.verticalLevels
   case 26, defaultLevel = 16;
   case 37, defaultLevel = 21;
-  case 50, defaultLevel = 37;
-  otherwise, defaultLevel = floor(this.verticalLevels*1/3);
+  case 50, defaultLevel = 27;
+  otherwise, defaultLevel = floor(this.verticalLevels*3/5);
 end
 
 % Parse inputs
