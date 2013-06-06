@@ -29,25 +29,28 @@ function alignTrueNorth(this)
 % Copyright 2013, The MITRE Corporation.  All rights reserved.
 %==========================================================================
 
-if this.windsAligntToTrueNorth
+if this.windsAlignedToTrueNorth
   error('Winds already aligned to true north.')    
 end
 
+uName = ['uComponentOfWind' this.verticalCoordSys];
+vName = ['vComponentOfWind' this.verticalCoordSys];
+
 % Check that object has the right fields loaded.
 if isprop(this,'longitude') && ...
-    isprop(this,'uComponentOfWind') &&...
-    isprop(this,'vComponentOfWind') && ...
+    isprop(this,uName) &&...
+    isprop(this,vName) && ...
     ~isempty(this.projection) && ...
     strcmp(this.projection.getClassName,'LambertConformal')
 
-  u = this.uComponentOfWind;
-  v = this.vComponentOfWind;
+  u = this.(uName);
+  v = this.(vName);
 
   % Retrieve projection parameters.
   originLat = this.projection.getOriginLat;
   rotConstant = sind(originLat);  
-  meridianAlignment = this.projection.getOriginLon;
-  nLevels = size(this.uComponentOfWind,1);
+  meridianAlignment = this.projection.getOriginLon - 360;
+  nLevels = size(u,1);
 
   % Vectorized, Calculate rotation conversions.
   angle = rotConstant.*(this.longitude - meridianAlignment); 
@@ -57,8 +60,8 @@ if isprop(this,'longitude') && ...
   sinAng = shiftdim(repmat(sinAng,[1 1 nLevels]),2);
 
   % Vectorized, Calculate wind vectors rotated wrt true North (met std).
-  this.uComponentOfWind = (cosAng.* u) + (sinAng .* v); 
-  this.vComponentOfWind = -(sinAng .* u) + (cosAng .* v);  
+  this.(uName) = (cosAng.* u) + (sinAng .* v); 
+  this.(vName) = -(sinAng .* u) + (cosAng .* v);  
   
   this.windsAlignedToTrueNorth = true;
 end

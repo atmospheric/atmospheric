@@ -35,9 +35,9 @@ function h = plot(this,varargin)
 % The magic numbers here were chosen empirically to correspond
 % approximately to the jet stream levels, around 300mb.
 switch this.verticalLevels
-  case 26, defaultLevel = 10;
-  case 37, defaultLevel = 16;
-  case 50, defaultLevel = 13;
+  case 26, defaultLevel = 16;
+  case 37, defaultLevel = 21;
+  case 50, defaultLevel = 37;
   otherwise, defaultLevel = floor(this.verticalLevels*1/3);
 end
 
@@ -61,8 +61,15 @@ if ischar(cmap)
   end   
 end
 
+
 %% Select a plane of data.
 level = p.Results.level;
+
+% For Hybrid grids, we do a lookup to find the index.
+if strcmpi(this.verticalCoordSys,'hybrid')
+  level = find(this.hybrid == level);
+end
+
 if strcmp(p.Results.variable,'wind')
   uName = ['uComponentOfWind' this.verticalCoordSys];
   vName = ['vComponentOfWind' this.verticalCoordSys];

@@ -35,12 +35,15 @@ function this = load(this,fieldsToLoad,enableUnitConversion)
 % Copyright 2013, The MITRE Corporation.  All rights reserved.
 %==========================================================================
 
+uWind = ['uComponentOfWind' this.verticalCoordSys];
+vWind = ['vComponentOfWind' this.verticalCoordSys];
+geopotential = ['geopotentialHeight' this.verticalCoordSys];
+geometric = ['geometricHeight' this.verticalCoordSys];
+
 % Set defaults
 if nargin < 3, enableUnitConversion = true; end
 if nargin < 2
-  fieldsToLoad = {['uComponentOfWind' this.verticalCoordSys],...
-    ['vComponentOfWind' this.verticalCoordSys],...
-    ['geopotentialHeight' this.verticalCoordSys]};
+  fieldsToLoad = {uWind, vWind, geopotential};
 end
 
 % Standardize as cell array, boolean.
@@ -62,9 +65,7 @@ if isempty(this.dataset), return, end
 fieldsToLoad = camel(fieldsToLoad);
 
 % Height always specified as geopotential, then compute geometric.
-fieldsToLoad = strrep(fieldsToLoad,...
-  ['geometricHeight' this.verticalCoordSys],...
-  ['geopotentialHeight'  this.verticalCoordSys]);
+fieldsToLoad = strrep(fieldsToLoad, geometric, geopotential);
 fieldsToLoad = strrep(fieldsToLoad,...
   'geometricHeightSurface','geopotentialHeightSurface');
 
@@ -130,15 +131,15 @@ this.variablesLoaded = union(this.variablesLoaded,fieldsToLoad)';
 if enableUnitConversion
   % Convert geopotentialHeight to geometricHeight
   % (Must be done before we convert to feet).
-  if any(strcmpi(fieldsToLoad,'geopotentialHeight'))
-    nLevels = size(this.geopotentialHeight,1);
+  if any(strcmpi(fieldsToLoad,geopotential))
+    nLevels = size(this.(geopotential),1);
     tmpLat = shiftdim(repmat(this.latitude,[1 1 nLevels]),2);
-    if ~isprop(this,'geometricHeight')
-      addprop(this,'geometricHeight');
+    if ~isprop(this,geometric)
+      addprop(this,geometric);
     end
-    this.geometricHeight = Atmospheric.geopotentialToGeometricHeight(...
-      this.geopotentialHeight,tmpLat) * this.feetPerMeter;
-    this.variablesLoaded = union(this.variablesLoaded,'geometricHeight');
+    this.(geometric) = Atmospheric.geopotentialToGeometricHeight(...
+      this.(geopotential),tmpLat) * this.feetPerMeter;
+    this.variablesLoaded = union(this.variablesLoaded, geometric);
     
 %     tmpLon = shiftdim(repmat(this.longitude,[1 1 nLevels]),2);
 %     addprop(this,'geoidHeight');
@@ -148,8 +149,7 @@ if enableUnitConversion
   end
   
   % Align winds to true north.
-  if any(strcmp(fieldsToLoad,'uComponentOfWind')) && ...
-      any(strcmp(fieldsToLoad,'vComponentOfWind'))
+  if any(strcmp(fieldsToLoad,uWind)) && any(strcmp(fieldsToLoad,vWind))
     this.alignTrueNorth();
   end
   
@@ -157,15 +157,15 @@ if enableUnitConversion
   for i = 1:length(fieldsToLoad)
     f = fieldsToLoad{i};
     switch f
-      case {'geometricHeight','geometricHeightSurface',...
-          'geopotentialHeight','geopotentialHeightSurface'}
+      case {geometric,'geometricHeightSurface',...
+          geopotential,'geopotentialHeightSurface'}
         this.(f) = this.(f) * this.feetPerMeter;
         
-      case {'uComponentOfWind','uComponentOfWindSurface',...
-          'vComponentOfWind','vComponentOfWindSurface'}
+      case {uWind,'uComponentOfWindSurface',...
+          vWind,'vComponentOfWindSurface'}
         this.(f) = this.(f) * this.knotsSecondPerMeter;
         
-      case {'pressure','pressureSurface'}
+      case {['pressure' this.verticalCoordSys],'pressureSurface'}
         this.(f) = this.(f) / 100;
     end
   end

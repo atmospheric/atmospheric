@@ -46,17 +46,24 @@ classdef Atmospheric < dynamicprops
         % Load basic file info.
         obj.dataset = ncdataset(filename);
         if ~isempty(obj.dataset)
-          % Define dates from NOAA metadata.
-          %str = attribute(obj.dataset,'_CoordinateModelRunDate');
-          %obj.forecastDate = datenum(str([1:10,12:19]),...
-          %  'yyyy-mm-ddHH:MM:SS');
+            
+          % Define Date based on Netcdf units for "Date". All in GMT.
+          import ucar.nc2.time.CalendarDateUnit;
+          dateUnits = obj.dataset.netcdf.findVariable('time').getUnitsString;
+          ncDate = CalendarDateUnit.of(java.lang.String('gregorian'),...
+              dateUnits);
+          baseDate = ncDate.getBaseCalendarDate();
+          epochTime = baseDate.getMillis(); % in UTC
+          obj.forecastDate = datenum('1970', 'yyyy') + epochTime / 864e5;
+
+          % Forecast outlook is a bit easier.
           obj.forecastOutlook = double(obj.dataset.data('time'));  
           if ~isempty(length(obj.forecastOutlook))
             obj.forecastOutlook = obj.forecastOutlook(1);
           end
           
-          % Keyword search over the Netcdf global attributes.
-          % Identifies NOAA product type.
+          % Identify NOAA product type
+          % (Keyword search over the Netcdf global attributes)
           attr = char(obj.dataset.netcdf.getGlobalAttributes().toString);
           knownTypes = '(gfs)|(rap)|(ruc)|(nam)|(hrrr)';
           tok = regexpi(attr,knownTypes,'once','tokens');
