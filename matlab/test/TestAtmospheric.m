@@ -3,6 +3,11 @@ classdef TestAtmospheric < TestCase
 %
 % SYNTAX:
 %   TestAtmospheric.all
+%
+% NOTES:
+%  - Tests the basic properties defined by the Atmospheric() constructor.
+%  - Truth values are determined from direct examination of the detailed
+%     Netcdf metadata dump, as provided by Atmospheric.details()
 
 % Copyright 2013, The MITRE Corporation.  All rights reserved.
 %==========================================================================
@@ -47,11 +52,6 @@ function test_Atmospheric_emptyConstructor(self) %#ok<*MANU,*DEFNU>
   assert(isempty(atmo.projectedDate))
 end
 
-% Test the basic properties for each file type.
-%
-% Truth values are determined from direct examination of the detailed
-% Netcdf metadata dump, as provided by Atmospheric.details()
-
 %% GFS Highres
 function test_Atmospheric_idGfsHighres_A(self)
   assert(strcmpi(self.gfsHighres.product,'gfs'))
@@ -61,6 +61,9 @@ function test_Atmospheric_idGfsHighres_B(self)
 end
 function test_Atmospheric_idGfsHighres_C(self)
   assert(self.gfsHighres.verticalLevels == 26)
+end
+function test_Atmospheric_idGfsHighres_D(self)
+  assert(self.gfsHighres.forecastDate == datenum(2013,6,3,12,0,0))
 end
 
 %% GFS Lowres
@@ -73,6 +76,9 @@ end
 function test_Atmospheric_idGfsLoweres_C(self)
   assert(self.gfsLowres.verticalLevels == 26)
 end
+function test_Atmospheric_idGfsLowhres_D(self)
+  assert(self.gfsLowres.forecastDate == datenum(2007,1,18,0,0,0))
+end
 
 %% NAM
 function test_Atmospheric_idNam_A(self)
@@ -83,6 +89,9 @@ function test_Atmospheric_idNam_B(self)
 end
 function test_Atmospheric_idNam_C(self)
   assert(self.namIsobaric.verticalLevels == 42)
+end
+function test_Atmospheric_idNamIsobaric_D(self)
+  assert(self.namIsobaric.forecastDate == datenum(2013,6,2,18,0,0))
 end
 
 %% RUC Isobaric 13km
@@ -95,6 +104,9 @@ end
 function test_Atmospheric_idRucIsobaric13_C(self)
   assert(self.rucIsobaric13km.verticalLevels == 37)
 end
+function test_Atmospheric_idRucIsobaric13_D(self)
+  assert(self.rucIsobaric13km.forecastDate == datenum(2010,2,19,7,0,0))
+end
 
 %% RUC Hybrid 13km
 function test_Atmospheric_idRucHybrid13_A(self)
@@ -105,6 +117,9 @@ function test_Atmospheric_idRucHybrid13_B(self)
 end
 function test_Atmospheric_idRucHybrid13_C(self)
   assert(self.rucHybrid13km.verticalLevels == 50)
+end
+function test_Atmospheric_idRucHybrid13_D(self)
+  assert(self.rucHybrid13km.forecastDate == datenum(2012,1,19,0,0,0))
 end
 
 %% RUC Hybrid 20km
@@ -117,6 +132,9 @@ end
 function test_Atmospheric_idRucHybrid20_C(self)
   assert(self.rucHybrid20km.verticalLevels == 50);
 end
+function test_Atmospheric_idRucHybrid20_D(self)
+  assert(self.rucHybrid20km.forecastDate == datenum(2005,1,13,6,0,0))
+end
 
 %% RAP Hybrid 13km
 function test_Atmospheric_idRapHybrid13_A(self)
@@ -127,6 +145,9 @@ function test_Atmospheric_idRapHybrid13_B(self)
 end
 function test_Atmospheric_idRapHybrid13_C(self)
   assert(self.rapHybrid13km.verticalLevels == 50);
+end
+function test_Atmospheric_idRapHybrid13_D(self)
+  assert(self.rapHybrid13km.forecastDate == datenum(2013,6,2,19,0,0))
 end
 
 %% RAP Isobaric 13km
@@ -139,7 +160,9 @@ end
 function test_Atmospheric_idRapIsobaric13_C(self)
   assert(self.rapIsobaric13km.verticalLevels == 37);
 end
-
+function test_Atmospheric_idRapIsobaric13_D(self)
+  assert(self.rapIsobaric13km.forecastDate == datenum(2013,6,2,19,0,0))
+end
 
 end
 end
