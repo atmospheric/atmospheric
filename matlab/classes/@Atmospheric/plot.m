@@ -111,7 +111,10 @@ if strcmp(p.Results.variable,'wind')
   xMax = 100;
   plotImage(this,plane,cmap,xMin,xMax);
   hold on;
-  n = 5;
+  
+  % Auto-scale to show as close to 100 arrows per row.
+  n = round(max(size(this.longitude))/100);
+  
   quiver(this.longitude(n:(2*n):(end-n),n:(2*n):(end-n)),...
     this.latitude(n:(2*n):(end-n),n:(2*n):(end-n)),...
     u(n:(2*n):(end-n),n:(2*n):(end-n)),...
