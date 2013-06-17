@@ -2,7 +2,7 @@ classdef TestAtmospheric < TestCase
 %TESTATMOSPHERIC Unit tests for the Atmospheric class
 %
 % SYNTAX:
-%   TestAtmospheric.all
+%   TestAtmospheric.all();
 %
 % NOTES:
 %  - Tests the basic properties defined by the Atmospheric() constructor.
@@ -20,6 +20,8 @@ properties
   rucHybrid13km = Atmospheric(AtmoSampleData.rucHybrid13km);
   rucHybrid20km = Atmospheric(AtmoSampleData.rucHybrid20km);
   rucIsobaric13km = Atmospheric(AtmoSampleData.rucIsobaric13km);
+  rucIsobaric40kmA = Atmospheric(AtmoSampleData.rucIsobaric40kmA);
+  rucIsobaric40kmB = Atmospheric(AtmoSampleData.rucIsobaric40kmB);
 end
 
 methods (Static)
@@ -108,6 +110,20 @@ function test_Atmospheric_idRucIsobaric13_D(self)
   assert(self.rucIsobaric13km.forecastDate == datenum(2010,2,19,7,0,0))
 end
 
+%% RUC Isobaric 40km
+function test_Atmospheric_idRucIsobaric40_A(self)
+  assert(strcmpi(self.rucIsobaric40kmA.product,'ruc'))
+end
+function test_Atmospheric_idRucIsobaric40_B(self)
+  assert(strcmpi(self.rucIsobaric40kmA.verticalCoordSys,'isobaric'))
+end
+function test_Atmospheric_idRucIsobaric40_C(self)
+  assert(self.rucIsobaric40kmA.verticalLevels == 37)
+end
+function test_Atmospheric_idRucIsobaric40_D(self)
+  assert(self.rucIsobaric40kmA.forecastDate == datenum(2011,4,30,7,0,0))
+end
+
 %% RUC Hybrid 13km
 function test_Atmospheric_idRucHybrid13_A(self)
   assert(strcmpi(self.rucHybrid13km.product,'ruc'))
@@ -163,6 +179,7 @@ end
 function test_Atmospheric_idRapIsobaric13_D(self)
   assert(self.rapIsobaric13km.forecastDate == datenum(2013,6,2,19,0,0))
 end
+
 
 end
 end
