@@ -1,7 +1,7 @@
 Atmospheric Toolbox
 ===========
 
-**Atmospheric Toolbox** is a set of Matlab� tools for 
+**Atmospheric Toolbox** is a set of Matlab&reserved; tools for 
 accessing, analyzing, and visualizing atmospheric data. 
 Large datasets, complex data formats, and incompatible 
 tools can make atmospheric analysis complicated. 
