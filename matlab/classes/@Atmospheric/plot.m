@@ -22,6 +22,8 @@ function h = plot(this,varargin)
 %   'colormap' - (DEFAULT = blue), matlab colormap
 %   'plotcoast' - (DEFAULT = true), boolean, toggle coastline
 %   'alpha' - (DEFAULT=0.8), 0.0 to 1.0, controls transparency
+%   'arrowSample' - Integer - Sampling downfactor for plotting the arrow.
+%   'domain' - [Integer, Integer] specifying input domain (with clipping).
 %
 % NOTES:
 %   Auto-loads variables as necessary.  Use 'this.variables' to see
@@ -41,11 +43,16 @@ switch this.verticalLevels
   otherwise, defaultLevel = floor(this.verticalLevels*3/5);
 end
 
+% Auto-scale to show as close to 100 arrows per row.
+defaultArrowSample = round(max(size(this.longitude))/50);
+
 % Parse inputs
 p = inputParser;
 p.addOptional('level',defaultLevel,@(x)isnumeric(x))
 p.addOptional('variable','wind')
 p.addOptional('colormap','blue')
+p.addOptional('domain',[0 100])
+p.addOptional('arrowSample',defaultArrowSample);
 p.addOptional('plotcoast',true,@(x)islogical(x))
 p.addOptional('alpha',0.8,@(x) (0 <= x) && (x <= 1.0))
 p.parse(varargin{:});
@@ -107,18 +114,18 @@ end
 
 % Special plot for the wind.
 if strcmp(p.Results.variable,'wind')
-  xMin = 0;
-  xMax = 100;
+  xMin = p.Results.domain(1);
+  xMax = p.Results.domain(2);
   plotImage(this,plane,cmap,xMin,xMax);
   hold on;
   
-  % Auto-scale to show as close to 100 arrows per row.
-  n = round(max(size(this.longitude))/100);
+  n = p.Results.arrowSample;
+  offset = floor(n/2) + 1;
+  xr = offset:n:(size(this.longitude,1) - offset);
+  yr = offset:n:(size(this.longitude,2) - offset);
   
-  quiver(this.longitude(n:(2*n):(end-n),n:(2*n):(end-n)),...
-    this.latitude(n:(2*n):(end-n),n:(2*n):(end-n)),...
-    u(n:(2*n):(end-n),n:(2*n):(end-n)),...
-    v(n:(2*n):(end-n),n:(2*n):(end-n)), 0.5, 'k');
+  quiver(this.longitude(xr,yr), this.latitude(xr,yr),...
+    u(xr,yr), v(xr,yr), 0.5, 'k');
 else
   xMin = max(min(plane(~isnan(plane(:)))),0);
   xMax = max(plane(~isnan(plane(:))));
