@@ -108,7 +108,7 @@ h = axes('box','on','position',[0 0 1 1]);
 
 % Plot coast
 if p.Results.plotcoast
-  c = load('coast');
+  c = load('lowresCoast');
   plot([c.long; NaN; c.long+360],[c.lat; NaN; c.lat],'k');
 end
 
